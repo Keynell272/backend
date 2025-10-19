@@ -11,9 +11,6 @@ public class RecetaDao {
     private DetalleRecetaDao detalleDao = new DetalleRecetaDao();
     private PacienteDao pacienteDao = new PacienteDao();
     
-    /**
-     * Inserta una nueva receta con sus detalles
-     */
     public boolean insertar(Receta receta) throws SQLException {
         String sql = "INSERT INTO recetas (id, fecha_confeccion, fecha_retiro, estado, paciente_id, medico_id) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
@@ -21,7 +18,7 @@ public class RecetaDao {
         Connection conn = Database.getInstance().getConnection();
         
         try {
-            conn.setAutoCommit(false); // Iniciar transacción
+            conn.setAutoCommit(false);
             
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, receta.getId());
@@ -34,27 +31,33 @@ public class RecetaDao {
                 stmt.executeUpdate();
             }
             
-            // Insertar los detalles
             for (DetalleReceta detalle : receta.getDetalles()) {
                 detalleDao.insertar(receta.getId(), detalle, conn);
             }
             
-            conn.commit(); // Confirmar transacción
+            conn.commit();
             return true;
             
         } catch (SQLException e) {
-            conn.rollback(); // Revertir en caso de error
+            conn.rollback();
             throw e;
         } finally {
             conn.setAutoCommit(true);
         }
     }
     
-    /**
-     * Busca una receta por ID
-     */
     public Receta buscarPorId(String id) throws SQLException {
         String sql = "SELECT * FROM recetas WHERE id = ?";
+        
+        String recetaId = null;
+        java.util.Date fechaConfeccion = null;
+        java.util.Date fechaRetiro = null;
+        String pacienteId = null;
+        String medicoId = null;
+        String estado = null;
+        java.util.Date fechaProceso = null;
+        java.util.Date fechaLista = null;
+        java.util.Date fechaEntrega = null;
         
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -63,51 +66,60 @@ public class RecetaDao {
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
-                java.util.Date fechaConfeccion = new java.util.Date(rs.getTimestamp("fecha_confeccion").getTime());
-                java.util.Date fechaRetiro = new java.util.Date(rs.getTimestamp("fecha_retiro").getTime());
-                String pacienteId = rs.getString("paciente_id");
-                String medicoId = rs.getString("medico_id");
-                String estado = rs.getString("estado");
+                recetaId = rs.getString("id");
+                fechaConfeccion = new java.util.Date(rs.getTimestamp("fecha_confeccion").getTime());
+                fechaRetiro = new java.util.Date(rs.getTimestamp("fecha_retiro").getTime());
+                pacienteId = rs.getString("paciente_id");
+                medicoId = rs.getString("medico_id");
+                estado = rs.getString("estado");
                 
-                Paciente paciente = pacienteDao.buscarPorId(pacienteId);
-                
-                Receta receta = new Receta(id, fechaConfeccion, fechaRetiro, paciente);
-                receta.setEstado(estado);
-                receta.setMedicoId(medicoId);
-                
-                // Cargar fechas de proceso si existen
-                Timestamp fechaProceso = rs.getTimestamp("fecha_proceso");
-                if (fechaProceso != null) {
-                    receta.setFechaProceso(new java.util.Date(fechaProceso.getTime()));
+                Timestamp tsProceso = rs.getTimestamp("fecha_proceso");
+                if (tsProceso != null) {
+                    fechaProceso = new java.util.Date(tsProceso.getTime());
                 }
                 
-                Timestamp fechaLista = rs.getTimestamp("fecha_lista");
-                if (fechaLista != null) {
-                    receta.setFechaLista(new java.util.Date(fechaLista.getTime()));
+                Timestamp tsLista = rs.getTimestamp("fecha_lista");
+                if (tsLista != null) {
+                    fechaLista = new java.util.Date(tsLista.getTime());
                 }
                 
-                Timestamp fechaEntrega = rs.getTimestamp("fecha_entrega");
-                if (fechaEntrega != null) {
-                    receta.setFechaEntrega(new java.util.Date(fechaEntrega.getTime()));
+                Timestamp tsEntrega = rs.getTimestamp("fecha_entrega");
+                if (tsEntrega != null) {
+                    fechaEntrega = new java.util.Date(tsEntrega.getTime());
                 }
-                
-                // Cargar los detalles
-                List<DetalleReceta> detalles = detalleDao.buscarPorReceta(id);
-                receta.setDetalles(detalles);
-                
-                return receta;
+            } else {
+                return null;
             }
         }
-        return null;
+        
+        Paciente paciente = pacienteDao.buscarPorId(pacienteId);
+        if (paciente == null) {
+            return null;
+        }
+        
+        Receta receta = new Receta(recetaId, fechaConfeccion, fechaRetiro, paciente);
+        receta.setEstado(estado);
+        receta.setMedicoId(medicoId);
+        
+        if (fechaProceso != null) {
+            receta.setFechaProceso(fechaProceso);
+        }
+        if (fechaLista != null) {
+            receta.setFechaLista(fechaLista);
+        }
+        if (fechaEntrega != null) {
+            receta.setFechaEntrega(fechaEntrega);
+        }
+        
+        List<DetalleReceta> detalles = detalleDao.buscarPorReceta(recetaId);
+        receta.setDetalles(detalles);
+        
+        return receta;
     }
     
-    /**
-     * Actualiza el estado de una receta
-     */
     public boolean actualizarEstado(String id, String nuevoEstado) throws SQLException {
         String sql = "UPDATE recetas SET estado = ?, ";
         
-        // Agregar el campo de fecha correspondiente
         switch (nuevoEstado) {
             case "proceso":
                 sql += "fecha_proceso = ? ";
@@ -119,7 +131,7 @@ public class RecetaDao {
                 sql += "fecha_entrega = ? ";
                 break;
             default:
-                sql += "estado = estado "; // No actualizar fecha
+                sql += "estado = estado ";
         }
         
         sql += "WHERE id = ?";
@@ -140,11 +152,8 @@ public class RecetaDao {
         }
     }
     
-    /**
-     * Lista todas las recetas
-     */
     public List<Receta> listarTodas() throws SQLException {
-        List<Receta> recetas = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         String sql = "SELECT id FROM recetas ORDER BY fecha_confeccion DESC";
         
         try (Connection conn = Database.getInstance().getConnection();
@@ -152,21 +161,23 @@ public class RecetaDao {
              ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
-                String id = rs.getString("id");
-                Receta receta = buscarPorId(id);
-                if (receta != null) {
-                    recetas.add(receta);
-                }
+                ids.add(rs.getString("id"));
             }
         }
+        
+        List<Receta> recetas = new ArrayList<>();
+        for (String id : ids) {
+            Receta receta = buscarPorId(id);
+            if (receta != null) {
+                recetas.add(receta);
+            }
+        }
+        
         return recetas;
     }
     
-    /**
-     * Lista recetas por estado
-     */
     public List<Receta> listarPorEstado(String estado) throws SQLException {
-        List<Receta> recetas = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         String sql = "SELECT id FROM recetas WHERE estado = ? ORDER BY fecha_confeccion DESC";
         
         try (Connection conn = Database.getInstance().getConnection();
@@ -176,13 +187,18 @@ public class RecetaDao {
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
-                String id = rs.getString("id");
-                Receta receta = buscarPorId(id);
-                if (receta != null) {
-                    recetas.add(receta);
-                }
+                ids.add(rs.getString("id"));
             }
         }
+        
+        List<Receta> recetas = new ArrayList<>();
+        for (String id : ids) {
+            Receta receta = buscarPorId(id);
+            if (receta != null) {
+                recetas.add(receta);
+            }
+        }
+        
         return recetas;
     }
 }

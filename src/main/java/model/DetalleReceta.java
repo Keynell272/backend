@@ -1,6 +1,6 @@
 package model;
 public class DetalleReceta {
-    private int id; // Nuevo campo para BD
+    private int id; 
     private Medicamento medicamento;
     private int cantidad;
     private String indicaciones;

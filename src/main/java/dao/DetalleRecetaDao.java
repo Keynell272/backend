@@ -11,9 +11,6 @@ public class DetalleRecetaDao {
     
     private MedicamentoDao medicamentoDao = new MedicamentoDao();
     
-    /**
-     * Inserta un detalle de receta (usado internamente por RecetaDao)
-     */
     public boolean insertar(String recetaId, DetalleReceta detalle, Connection conn) throws SQLException {
         String sql = "INSERT INTO detalle_recetas (receta_id, medicamento_codigo, cantidad, indicaciones, duracion_dias) " +
                      "VALUES (?, ?, ?, ?, ?)";
@@ -29,11 +26,8 @@ public class DetalleRecetaDao {
         }
     }
     
-    /**
-     * Busca todos los detalles de una receta
-     */
     public List<DetalleReceta> buscarPorReceta(String recetaId) throws SQLException {
-        List<DetalleReceta> detalles = new ArrayList<>();
+        List<DetalleInfo> infos = new ArrayList<>();
         String sql = "SELECT * FROM detalle_recetas WHERE receta_id = ?";
         
         try (Connection conn = Database.getInstance().getConnection();
@@ -43,20 +37,34 @@ public class DetalleRecetaDao {
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
-                int id = rs.getInt("id");
-                String medicamentoCodigo = rs.getString("medicamento_codigo");
-                int cantidad = rs.getInt("cantidad");
-                String indicaciones = rs.getString("indicaciones");
-                int duracionDias = rs.getInt("duracion_dias");
-                
-                Medicamento medicamento = medicamentoDao.buscarPorCodigo(medicamentoCodigo);
-                
-                if (medicamento != null) {
-                    DetalleReceta detalle = new DetalleReceta(id, medicamento, cantidad, indicaciones, duracionDias);
-                    detalles.add(detalle);
-                }
+                DetalleInfo info = new DetalleInfo();
+                info.id = rs.getInt("id");
+                info.medicamentoCodigo = rs.getString("medicamento_codigo");
+                info.cantidad = rs.getInt("cantidad");
+                info.indicaciones = rs.getString("indicaciones");
+                info.duracionDias = rs.getInt("duracion_dias");
+                infos.add(info);
             }
         }
+        
+        List<DetalleReceta> detalles = new ArrayList<>();
+        for (DetalleInfo info : infos) {
+            Medicamento medicamento = medicamentoDao.buscarPorCodigo(info.medicamentoCodigo);
+            if (medicamento != null) {
+                DetalleReceta detalle = new DetalleReceta(info.id, medicamento, info.cantidad, 
+                                                         info.indicaciones, info.duracionDias);
+                detalles.add(detalle);
+            }
+        }
+        
         return detalles;
+    }
+    
+    private static class DetalleInfo {
+        int id;
+        String medicamentoCodigo;
+        int cantidad;
+        String indicaciones;
+        int duracionDias;
     }
 }
