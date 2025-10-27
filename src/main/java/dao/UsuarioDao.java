@@ -152,4 +152,16 @@ public class UsuarioDao {
         }
         return usuarios;
     }
+
+    public boolean eliminar(String id) throws SQLException {
+        String sql = "DELETE FROM usuarios WHERE id = ?";
+        
+        try (Connection conn = Database.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, id);
+            
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }

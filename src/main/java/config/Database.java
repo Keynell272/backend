@@ -15,8 +15,8 @@ public class Database {
     
     // Parámetros de conexión
     private static final String URL = "jdbc:mysql://localhost:3306/hospital_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = ""; // Cambiar según tu configuración
+    private static final String USER = "user";
+    private static final String PASSWORD = "V7p!qT9#xL2@eR4"; // Cambiar según tu configuración
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
     
     // Conexión

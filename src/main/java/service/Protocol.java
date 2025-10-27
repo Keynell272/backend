@@ -7,7 +7,7 @@ package service;
  * IMPORTANTE: Esta clase debe ser IDÉNTICA en Frontend y Backend
  */
 public class Protocol {
-    
+
     // ==================== TIPOS DE MENSAJE ====================
     public static final String TYPE_REQUEST = "REQUEST";
     public static final String TYPE_RESPONSE = "RESPONSE";
@@ -42,7 +42,6 @@ public class Protocol {
     // ==================== ACCIONES - CATÁLOGO ====================
     public static final String ACTION_AGREGAR_MEDICAMENTO = "AGREGAR_MEDICAMENTO";
     public static final String ACTION_ACTUALIZAR_MEDICAMENTO = "ACTUALIZAR_MEDICAMENTO";
-    public static final String ACTION_ELIMINAR_MEDICAMENTO = "ELIMINAR_MEDICAMENTO";
     public static final String ACTION_BUSCAR_MEDICAMENTO = "BUSCAR_MEDICAMENTO";
     
     // ==================== ACCIONES - PACIENTES ====================
@@ -65,6 +64,11 @@ public class Protocol {
     public static final String ACTION_MARCAR_MENSAJE_LEIDO = "MARCAR_MENSAJE_LEIDO";
     public static final String ACTION_CONTAR_MENSAJES_NO_LEIDOS = "CONTAR_MENSAJES_NO_LEIDOS";
     
+    // ==================== ACCIONES - ELIMINAR ====================
+    public static final String ACTION_ELIMINAR_USUARIO = "eliminarUsuario";
+    public static final String ACTION_ELIMINAR_PACIENTE = "eliminarPaciente";
+    public static final String ACTION_ELIMINAR_MEDICAMENTO = "ELIMINAR_MEDICAMENTO";
+
     // ==================== NOTIFICACIONES ASÍNCRONAS ====================
     public static final String NOTIFICATION_USER_LOGIN = "USER_LOGIN";
     public static final String NOTIFICATION_USER_LOGOUT = "USER_LOGOUT";

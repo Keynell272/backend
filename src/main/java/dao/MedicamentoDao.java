@@ -65,30 +65,29 @@ public class MedicamentoDao {
     }
     
     /**
-     * Elimina un medicamento
+     * Desactiva un medicamento (no lo elimina)
      */
     public boolean eliminar(String codigo) throws SQLException {
-        String sql = "DELETE FROM medicamentos WHERE codigo = ?";
+        String sql = "UPDATE medicamentos SET estado = 'inactivo' WHERE codigo = ?";
         
         try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, codigo);
-            
             return stmt.executeUpdate() > 0;
         }
     }
     
     /**
-     * Lista todos los medicamentos
+     * Lista todos los medicamentos activos
      */
     public List<Medicamento> listarTodos() throws SQLException {
         List<Medicamento> medicamentos = new ArrayList<>();
-        String sql = "SELECT * FROM medicamentos";
+        String sql = "SELECT * FROM medicamentos WHERE estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
                 String codigo = rs.getString("codigo");

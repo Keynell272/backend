@@ -128,6 +128,8 @@ public class Service {
                     return procesarActualizarPaciente(data);
                 case Protocol.ACTION_BUSCAR_PACIENTE:
                     return procesarBuscarPaciente(data);
+                case Protocol.ACTION_ELIMINAR_PACIENTE:
+                    return procesarEliminarPaciente(data);
                 
                 // USUARIOS
                 case Protocol.ACTION_LISTAR_USUARIOS:
@@ -136,6 +138,8 @@ public class Service {
                     return procesarAgregarUsuario(data);
                 case Protocol.ACTION_LISTAR_USUARIOS_ACTIVOS:
                     return procesarListarUsuariosActivos();
+                case Protocol.ACTION_ELIMINAR_USUARIO:
+                    return procesarEliminarUsuario(data);
                 
                 // MENSAJERÍA
                 case Protocol.ACTION_ENVIAR_MENSAJE:
@@ -371,12 +375,13 @@ public class Service {
             boolean exito = medicamentoDao.eliminar(codigo);
             
             if (exito) {
-                return crearRespuestaExito("Medicamento eliminado exitosamente");
+                return crearRespuestaExito("Medicamento desactivado exitosamente");
             } else {
-                return crearRespuestaError("No se pudo eliminar el medicamento");
+                return crearRespuestaError("No se pudo desactivar el medicamento");
             }
         } catch (Exception e) {
-            return crearRespuestaError("Error al eliminar medicamento: " + e.getMessage());
+            e.printStackTrace();
+            return crearRespuestaError("Error al desactivar medicamento: " + e.getMessage());
         }
     }
     
@@ -460,6 +465,22 @@ public class Service {
         }
     }
     
+    private String procesarEliminarPaciente(JSONObject data) {
+        try {
+            String id = data.getString(Protocol.FIELD_PACIENTE_ID);
+            
+            boolean exito = pacienteDao.eliminar(id);
+            
+            if (exito) {
+                return crearRespuestaExito("Paciente eliminado exitosamente");
+            } else {
+                return crearRespuestaError("No se pudo eliminar el paciente");
+            }
+        } catch (Exception e) {
+            return crearRespuestaError("Error al eliminar paciente: " + e.getMessage());
+        }
+    }
+
     // ==================== PRESCRIPCIÓN Y DESPACHO ====================
     
     private String procesarCrearReceta(JSONObject data) {
@@ -703,6 +724,22 @@ public class Service {
             return crearRespuestaExito("Lista de usuarios activos obtenida", respData);
         } catch (Exception e) {
             return crearRespuestaError("Error al listar usuarios activos: " + e.getMessage());
+        }
+    }
+
+    private String procesarEliminarUsuario(JSONObject data) {
+        try {
+            String id = data.getString(Protocol.FIELD_USUARIO_ID);
+            
+            boolean exito = usuarioDao.eliminar(id);
+            
+            if (exito) {
+                return crearRespuestaExito("Usuario eliminado exitosamente");
+            } else {
+                return crearRespuestaError("No se pudo eliminar el usuario");
+            }
+        } catch (Exception e) {
+            return crearRespuestaError("Error al eliminar usuario: " + e.getMessage());
         }
     }
     
