@@ -92,7 +92,7 @@ public class RecetaDao {
             }
         }
         
-        Paciente paciente = pacienteDao.buscarPorId(pacienteId);
+        Paciente paciente = pacienteDao.buscarPorIdSinFiltro(pacienteId);
         if (paciente == null) {
             return null;
         }
@@ -201,4 +201,5 @@ public class RecetaDao {
         
         return recetas;
     }
+    
 }

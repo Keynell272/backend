@@ -9,15 +9,15 @@ import java.util.List;
 public class FarmaceutaDao {
     
     /**
-     * Lista todos los farmaceutas
+     * Lista todos los farmacéutas ACTIVOS
      */
     public List<Farmaceuta> listarTodos() throws SQLException {
         List<Farmaceuta> farmaceutas = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios WHERE rol = 'FAR'";
+        String sql = "SELECT * FROM usuarios WHERE rol = 'FAR' AND estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
                 String id = rs.getString("id");
@@ -29,15 +29,15 @@ public class FarmaceutaDao {
         }
         return farmaceutas;
     }
-    
+
     /**
-     * Busca un farmaceuta por ID
+     * Busca un farmacéuta ACTIVO por ID
      */
     public Farmaceuta buscarPorId(String id) throws SQLException {
-        String sql = "SELECT * FROM usuarios WHERE id = ? AND rol = 'FAR'";
+        String sql = "SELECT * FROM usuarios WHERE id = ? AND rol = 'FAR' AND estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();

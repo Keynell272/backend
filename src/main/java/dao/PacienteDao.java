@@ -27,13 +27,13 @@ public class PacienteDao {
     }
     
     /**
-     * Busca un paciente por ID
+     * Busca un paciente ACTIVO por ID
      */
     public Paciente buscarPorId(String id) throws SQLException {
-        String sql = "SELECT * FROM pacientes WHERE id = ?";
+        String sql = "SELECT * FROM pacientes WHERE id = ? AND estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -68,15 +68,15 @@ public class PacienteDao {
     }
     
     /**
-     * Lista todos los pacientes
+     * Lista todos los pacientes ACTIVOS
      */
     public List<Paciente> listarTodos() throws SQLException {
         List<Paciente> pacientes = new ArrayList<>();
-        String sql = "SELECT * FROM pacientes";
+        String sql = "SELECT * FROM pacientes WHERE estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
                 String id = rs.getString("id");
@@ -90,8 +90,11 @@ public class PacienteDao {
         return pacientes;
     }
 
+    /**
+     * Desactiva un paciente (no lo elimina fisicamente)
+     */
     public boolean eliminar(String id) throws SQLException {
-        String sql = "DELETE FROM pacientes WHERE id = ?";
+        String sql = "UPDATE pacientes SET estado = 'inactivo' WHERE id = ?";
         
         try (Connection conn = Database.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -100,5 +103,29 @@ public class PacienteDao {
             
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    /**
+     * Busca un paciente (ACTIVO o INACTIVO) por ID
+     * Usado para consultar histórico de recetas
+     */
+    public Paciente buscarPorIdSinFiltro(String id) throws SQLException {
+        String sql = "SELECT * FROM pacientes WHERE id = ?";
+        
+        try (Connection conn = Database.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                String nombre = rs.getString("nombre");
+                java.util.Date fechaNacimiento = new java.util.Date(rs.getDate("fecha_nacimiento").getTime());
+                String telefono = rs.getString("telefono");
+                
+                return new Paciente(id, nombre, fechaNacimiento, telefono);
+            }
+        }
+        return null;
     }
 }

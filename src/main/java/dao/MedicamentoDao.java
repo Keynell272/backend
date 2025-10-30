@@ -25,14 +25,15 @@ public class MedicamentoDao {
         }
     }
     
+    
     /**
-     * Busca un medicamento por código
+     * Busca un medicamento ACTIVO por código
      */
     public Medicamento buscarPorCodigo(String codigo) throws SQLException {
-        String sql = "SELECT * FROM medicamentos WHERE codigo = ?";
+        String sql = "SELECT * FROM medicamentos WHERE codigo = ? AND estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, codigo);
             ResultSet rs = stmt.executeQuery();

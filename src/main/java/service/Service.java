@@ -369,21 +369,21 @@ public class Service {
     }
     
     private String procesarEliminarMedicamento(JSONObject data) {
-        try {
-            String codigo = data.getString(Protocol.FIELD_MEDICAMENTO_CODIGO);
-            
-            boolean exito = medicamentoDao.eliminar(codigo);
-            
-            if (exito) {
-                return crearRespuestaExito("Medicamento desactivado exitosamente");
-            } else {
-                return crearRespuestaError("No se pudo desactivar el medicamento");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return crearRespuestaError("Error al desactivar medicamento: " + e.getMessage());
+    try {
+        String codigo = data.getString(Protocol.FIELD_MEDICAMENTO_CODIGO);
+        
+        boolean exito = medicamentoDao.eliminar(codigo);
+        
+        if (exito) {
+            return crearRespuestaExito("Medicamento desactivado exitosamente");
+        } else {
+            return crearRespuestaError("No se pudo desactivar el medicamento");
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+        return crearRespuestaError("Error al desactivar medicamento: " + e.getMessage());
     }
+}
     
     private String procesarBuscarMedicamento(JSONObject data) {
         try {
@@ -472,12 +472,12 @@ public class Service {
             boolean exito = pacienteDao.eliminar(id);
             
             if (exito) {
-                return crearRespuestaExito("Paciente eliminado exitosamente");
+                return crearRespuestaExito("Paciente desactivado exitosamente");
             } else {
-                return crearRespuestaError("No se pudo eliminar el paciente");
+                return crearRespuestaError("No se pudo desactivar el paciente");
             }
         } catch (Exception e) {
-            return crearRespuestaError("Error al eliminar paciente: " + e.getMessage());
+            return crearRespuestaError("Error al desactivar paciente: " + e.getMessage());
         }
     }
 
@@ -734,12 +734,12 @@ public class Service {
             boolean exito = usuarioDao.eliminar(id);
             
             if (exito) {
-                return crearRespuestaExito("Usuario eliminado exitosamente");
+                return crearRespuestaExito("Usuario desactivado exitosamente");
             } else {
-                return crearRespuestaError("No se pudo eliminar el usuario");
+                return crearRespuestaError("No se pudo desactivar el usuario");
             }
         } catch (Exception e) {
-            return crearRespuestaError("Error al eliminar usuario: " + e.getMessage());
+            return crearRespuestaError("Error al desactivar usuario: " + e.getMessage());
         }
     }
     

@@ -1,5 +1,5 @@
 -- ============================================================
--- SCRIPT DE BASE DE DATOS
+-- SCRIPT DE BASE DE DATOS - VERSIÓN ACTUALIZADA
 -- Sistema de Prescripción y Despacho de Recetas
 -- ============================================================
 
@@ -17,7 +17,9 @@ CREATE TABLE usuarios (
     nombre VARCHAR(100) NOT NULL,
     rol ENUM('ADM', 'MED', 'FAR') NOT NULL,
     especialidad VARCHAR(100) NULL,
-    INDEX idx_rol (rol)
+    estado VARCHAR(20) DEFAULT 'activo',
+    INDEX idx_rol (rol),
+    INDEX idx_estado (estado)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
@@ -28,7 +30,9 @@ CREATE TABLE pacientes (
     nombre VARCHAR(100) NOT NULL,
     fecha_nacimiento DATE NOT NULL,
     telefono VARCHAR(20) NOT NULL,
-    INDEX idx_nombre (nombre)
+    estado VARCHAR(20) DEFAULT 'activo',
+    INDEX idx_nombre (nombre),
+    INDEX idx_estado (estado)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
@@ -80,7 +84,7 @@ CREATE TABLE detalle_recetas (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
--- TABLA: usuarios_activos (NUEVO para Proyecto #2)
+-- TABLA: usuarios_activos
 -- ============================================================
 CREATE TABLE usuarios_activos (
     usuario_id VARCHAR(20) PRIMARY KEY,
@@ -92,7 +96,7 @@ CREATE TABLE usuarios_activos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
--- TABLA: mensajes (NUEVO para Proyecto #2)
+-- TABLA: mensajes
 -- ============================================================
 CREATE TABLE mensajes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,21 +119,21 @@ CREATE TABLE mensajes (
 -- ============================================================
 
 -- Insertar usuarios
-INSERT INTO usuarios (id, clave, nombre, rol, especialidad) VALUES
-('ADM001', '1234', 'Admin Principal', 'ADM', NULL),
-('MED001', '1234', 'Dr. Juan García', 'MED', 'Medicina General'),
-('MED002', '1234', 'Dra. María López', 'MED', 'Pediatría'),
-('MED003', '1234', 'Dr. Carlos Rodríguez', 'MED', 'Cardiología'),
-('FAR001', '1234', 'Farm. Ana Martínez', 'FAR', NULL),
-('FAR002', '1234', 'Farm. Pedro Sánchez', 'FAR', NULL);
+INSERT INTO usuarios (id, clave, nombre, rol, especialidad, estado) VALUES
+('ADM001', '1234', 'Admin Principal', 'ADM', NULL, 'activo'),
+('MED001', '1234', 'Dr. Juan García', 'MED', 'Medicina General', 'activo'),
+('MED002', '1234', 'Dra. María López', 'MED', 'Pediatría', 'activo'),
+('MED003', '1234', 'Dr. Carlos Rodríguez', 'MED', 'Cardiología', 'activo'),
+('FAR001', '1234', 'Farm. Ana Martínez', 'FAR', NULL, 'activo'),
+('FAR002', '1234', 'Farm. Pedro Sánchez', 'FAR', NULL, 'activo');
 
 -- Insertar pacientes
-INSERT INTO pacientes (id, nombre, fecha_nacimiento, telefono) VALUES
-('PAC001', 'José Hernández', '1985-03-15', '8888-1111'),
-('PAC002', 'Laura Jiménez', '1990-07-22', '8888-2222'),
-('PAC003', 'Roberto Castro', '1978-11-30', '8888-3333'),
-('PAC004', 'Carmen Vargas', '1995-05-10', '8888-4444'),
-('PAC005', 'Miguel Ángel Mora', '1982-09-18', '8888-5555');
+INSERT INTO pacientes (id, nombre, fecha_nacimiento, telefono, estado) VALUES
+('PAC001', 'José Hernández', '1985-03-15', '8888-1111', 'activo'),
+('PAC002', 'Laura Jiménez', '1990-07-22', '8888-2222', 'activo'),
+('PAC003', 'Roberto Castro', '1978-11-30', '8888-3333', 'activo'),
+('PAC004', 'Carmen Vargas', '1995-05-10', '8888-4444', 'activo'),
+('PAC005', 'Miguel Ángel Mora', '1982-09-18', '8888-5555', 'activo');
 
 -- Insertar medicamentos
 INSERT INTO medicamentos (codigo, nombre, presentacion, estado) VALUES

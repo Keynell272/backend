@@ -44,13 +44,13 @@ public class UsuarioDao {
     }
     
     /**
-     * Busca un usuario por su ID
+     * Busca un usuario ACTIVO por su ID
      */
     public Usuario buscarPorId(String id) throws SQLException {
-        String sql = "SELECT * FROM usuarios WHERE id = ?";
+        String sql = "SELECT * FROM usuarios WHERE id = ? AND estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -116,15 +116,15 @@ public class UsuarioDao {
     }
     
     /**
-     * Lista todos los usuarios
+     * Lista todos los usuarios ACTIVOS
      */
     public List<Usuario> listarTodos() throws SQLException {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios";
+        String sql = "SELECT * FROM usuarios WHERE estado = 'activo'";
         
         try (Connection conn = Database.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
                 String id = rs.getString("id");
@@ -153,8 +153,11 @@ public class UsuarioDao {
         return usuarios;
     }
 
+    /**
+     * Desactiva un usuario (no lo elimina fisicamente)
+     */
     public boolean eliminar(String id) throws SQLException {
-        String sql = "DELETE FROM usuarios WHERE id = ?";
+        String sql = "UPDATE usuarios SET estado = 'inactivo' WHERE id = ?";
         
         try (Connection conn = Database.getInstance().getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
